@@ -184,180 +184,105 @@ async function generateImage(prompt, style, productKey) {
     ? `${prompt}. Style: ${styleObj.basePrompt}. ${negativePrompt}`
     : `${fallbackPrompt}. ${negativePrompt}`;
 
+  console.log('[IMAGE] Final prompt:', finalPrompt.substring(0, 200) + '...');
+
   const getUnsplashFallback = () => {
     const list = FALLBACK_IMAGES[productKey] || FALLBACK_IMAGES.general;
     return list[Math.floor(Math.random() * list.length)];
   };
 
-  const callGeminiImageAPI = async () => {
-    return await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-flash-image:generateContent?key=${process.env.GEMINI_API_KEY}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: finalPrompt,
-              }
-            ]
+  // ─── Strategy 1: OpenAI gpt-image-1 (primary — works on all paid accounts) ──
+  if (process.env.OPENAI_API_KEY) {
+    const models = ['gpt-image-1', 'dall-e-3', 'dall-e-2'];
+    for (const model of models) {
+      try {
+        console.log(`[IMAGE] Trying OpenAI ${model}...`);
+        const response = await fetch('https://api.openai.com/v1/images/generations', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model,
+            prompt: finalPrompt,
+            n: 1,
+            size: '1024x1024',
+            ...(model === 'gpt-image-1' ? { quality: 'medium' } : {})
+          }),
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          const imageData = data.data?.[0];
+          // gpt-image-1 returns b64_json by default, dall-e returns url
+          const url = imageData?.url || (imageData?.b64_json ? `data:image/png;base64,${imageData.b64_json}` : null);
+          if (url) {
+            console.log(`[IMAGE] ✅ Success with OpenAI ${model}`);
+            return {
+              url,
+              revised_prompt: imageData?.revised_prompt || finalPrompt,
+              isFallback: false
+            };
           }
-        ],
-        generationConfig: {
-          responseModalities: ["IMAGE"]
         }
-      }),
-    });
-  };
-
-  const callOpenAIImageAPI = async (modelName) => {
-    return await fetch('https://api.openai.com/v1/images/generations', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: modelName,
-        prompt: finalPrompt,
-        n: 1,
-        size: '1024x1024'
-      }),
-    });
-  };
-
-  try {
-    let response;
-    let isFallback = false;
-    let originalError = null;
-    let provider = null;
-
-    if (process.env.OPENAI_API_KEY) {
-      console.log('Generating image with OpenAI DALL-E 3...');
-      provider = 'openai';
-      response = await callOpenAIImageAPI('dall-e-3');
-      if (!response.ok) {
+        
         const err = await response.json().catch(() => ({}));
         const errMsg = err.error?.message || JSON.stringify(err);
-        console.warn('OpenAI DALL-E 3 failed:', errMsg);
-        originalError = errMsg;
-
-        // Try falling back to Gemini if OpenAI fails
-        if (process.env.GEMINI_API_KEY) {
-          console.log('OpenAI failed, falling back to Gemini Imagen 3 (Nano Banana 2)...');
-          provider = 'gemini';
-          response = await callGeminiImageAPI();
-        } else {
-          // If no Gemini key, try DALL-E 2 as OpenAI fallback before final fallback
-          console.log('Falling back to DALL-E 2...');
-          provider = 'openai_dalle2';
-          response = await callOpenAIImageAPI('dall-e-2');
-          if (!response.ok) {
-            isFallback = true;
-          }
+        console.warn(`[IMAGE] ❌ OpenAI ${model} failed:`, errMsg);
+        
+        // If billing/auth error, no point trying other OpenAI models
+        if (errMsg.includes('billing') || errMsg.includes('insufficient_quota') || errMsg.includes('authentication')) {
+          console.warn('[IMAGE] OpenAI auth/billing issue, skipping remaining models');
+          break;
         }
-      }
-    } else if (process.env.GEMINI_API_KEY) {
-      console.log('OPENAI_API_KEY not found. Using Gemini Imagen 3 (Nano Banana 2)...');
-      provider = 'gemini';
-      response = await callGeminiImageAPI();
-      if (!response.ok) {
-        isFallback = true;
-      }
-    } else {
-      console.warn('No image API keys available. Using Unsplash fallback.');
-      isFallback = true;
-    }
-
-    // Process OpenAI response (DALL-E 3 or DALL-E 2)
-    if (!isFallback && (provider === 'openai' || provider === 'openai_dalle2')) {
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        const errMsg = err.error?.message || '';
-        console.warn(`${provider} API failed:`, errMsg);
-        originalError = errMsg;
-
-        // If DALL-E 3 failed, try DALL-E 2
-        if (provider === 'openai' && (errMsg.includes('does not exist') || errMsg.includes('model_not_found') || errMsg.includes('billing') || errMsg.includes('credit'))) {
-          console.log('Falling back to DALL-E 2...');
-          provider = 'openai_dalle2';
-          response = await callOpenAIImageAPI('dall-e-2');
-          if (!response.ok) {
-            // Try Gemini as last resort if we have Gemini key
-            if (process.env.GEMINI_API_KEY) {
-              console.log('DALL-E 2 also failed, falling back to Gemini Imagen 3...');
-              provider = 'gemini';
-              response = await callGeminiImageAPI();
-            } else {
-              isFallback = true;
-            }
-          }
-        } else {
-          // If it's already DALL-E 2 or a non-recoverable error, try Gemini if key exists
-          if (process.env.GEMINI_API_KEY) {
-            console.log('OpenAI failed, falling back to Gemini Imagen 3...');
-            provider = 'gemini';
-            response = await callGeminiImageAPI();
-          } else {
-            isFallback = true;
-          }
-        }
-      }
-      
-      // If we successfully called and parsed an OpenAI request
-      if (!isFallback && (provider === 'openai' || provider === 'openai_dalle2')) {
-        const data = await response.json();
-        return {
-          url: data.data?.[0]?.url,
-          revised_prompt: data.data?.[0]?.revised_prompt || finalPrompt,
-          isFallback: false
-        };
+      } catch (e) {
+        console.warn(`[IMAGE] ❌ OpenAI ${model} exception:`, e.message);
       }
     }
+  }
 
-    if (!isFallback && provider === 'gemini') {
-      if (!response.ok) {
-        const err = await response.json().catch(() => ({}));
-        const errMsg = err.error?.message || JSON.stringify(err);
-        console.warn('Gemini Imagen 3 failed:', errMsg);
-        originalError = errMsg;
-        isFallback = true;
-      } else {
+  // ─── Strategy 2: Gemini Imagen ────────────────────────────────────────────
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      console.log('[IMAGE] Trying Gemini Imagen 3...');
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contents: [{ parts: [{ text: `Generate an image: ${finalPrompt}` }] }],
+          generationConfig: { responseModalities: ["IMAGE"] }
+        }),
+      });
+
+      if (response.ok) {
         const data = await response.json();
         const part = data.candidates?.[0]?.content?.parts?.[0];
         const inlineData = part?.inlineData;
         if (inlineData && inlineData.data) {
-          const mimeType = inlineData.mimeType || 'image/png';
+          console.log('[IMAGE] ✅ Success with Gemini Imagen');
           return {
-            url: `data:${mimeType};base64,${inlineData.data}`,
+            url: `data:${inlineData.mimeType || 'image/png'};base64,${inlineData.data}`,
             revised_prompt: finalPrompt,
             isFallback: false
           };
-        } else {
-          console.warn('Invalid Gemini response format:', data);
-          originalError = 'Invalid response format';
-          isFallback = true;
         }
       }
+      
+      const err = await response.json().catch(() => ({}));
+      console.warn('[IMAGE] ❌ Gemini failed:', err.error?.message || JSON.stringify(err));
+    } catch (e) {
+      console.warn('[IMAGE] ❌ Gemini exception:', e.message);
     }
-
-    if (isFallback) {
-      return {
-        url: getUnsplashFallback(),
-        isFallback: true,
-        originalError: originalError || 'All models failed'
-      };
-    }
-  } catch (err) {
-    console.error('Image generation error, falling back to Unsplash:', err);
-    return {
-      url: getUnsplashFallback(),
-      isFallback: true,
-      originalError: err.message
-    };
   }
+
+  // ─── Strategy 3: Unsplash fallback ────────────────────────────────────────
+  console.warn('[IMAGE] ⚠️ All AI image providers failed. Using Unsplash fallback.');
+  return {
+    url: getUnsplashFallback(),
+    isFallback: true,
+    originalError: 'All AI image providers failed'
+  };
 }
 
 // ─── Main handler ─────────────────────────────────────────────────────────────
