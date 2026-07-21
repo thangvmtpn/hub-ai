@@ -120,13 +120,14 @@ ${format.guidelines}
    - **Hashtags ở cuối**: Luôn thêm các hashtag liên quan ở cuối bài viết, tách biệt với nội dung chính bằng 1-2 dòng trống. Các hashtag viết dạng CamelCase hoặc liền không dấu (ví dụ: #VanLocTra, #TraXanhThaiNguyen).
 
 ## ĐẶC BIỆT QUAN TRỌNG
-Cuối bài viết, bạn PHẢI thêm một block riêng chứa prompt vẽ ảnh như sau:
+Cuối bài viết, bạn PHẢI tạo ra một Visual Prompt (bằng TIẾNG ANH) tóm tắt nội dung chính của bài viết để vẽ ảnh. 
+Đặt Visual Prompt này vào giữa thẻ [IMAGE_PROMPT] và [/IMAGE_PROMPT], ví dụ:
 
----IMAGE_PROMPT---
-[Viết 1 câu mô tả chi tiết bằng TIẾNG ANH cho ảnh minh họa phù hợp với nội dung bài viết. Mô tả phải cụ thể về: subject, lighting, mood, composition, color palette. Không dùng text/typography trong ảnh.]
----END_IMAGE_PROMPT---
+[IMAGE_PROMPT]
+A high quality photo of a traditional Vietnamese teapot on a wooden table, warm morning light, lush green background.
+[/IMAGE_PROMPT]
 
-Ảnh phải phù hợp chủ đề, đẹp, chuyên nghiệp và KHÔNG chứa chữ/text.`;
+Ảnh PHẢI ăn khớp với nội dung bài viết trên và KHÔNG chứa chữ/text.`;
 
   return sys;
 }
@@ -178,9 +179,10 @@ async function generateImage(prompt, style, productKey) {
   const fallbackPrompt = `${styleObj.variants[variant] || styleObj.variants.teapot}. ${styleObj.basePrompt}`;
 
   // Use the AI-generated prompt if available, otherwise fallback
+  const negativePrompt = "No text, no words, no letters, no typography, no watermarks, clean focus.";
   const finalPrompt = prompt
-    ? `${prompt}. Style: ${styleObj.basePrompt}`
-    : fallbackPrompt;
+    ? `${prompt}. Style: ${styleObj.basePrompt}. ${negativePrompt}`
+    : `${fallbackPrompt}. ${negativePrompt}`;
 
   const getUnsplashFallback = () => {
     const list = FALLBACK_IMAGES[productKey] || FALLBACK_IMAGES.general;
@@ -416,7 +418,7 @@ export async function POST(request) {
             userPrompt,
             onChunk(chunk) {
               fullText += chunk;
-              const markerIdx = fullText.indexOf('---IMAGE_PROMPT---');
+              const markerIdx = fullText.indexOf('[IMAGE_PROMPT]');
               if (markerIdx === -1) {
                 controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: chunk })}\n\n`));
                 sentText += chunk;
@@ -437,13 +439,21 @@ export async function POST(request) {
 
           // Step 2: Extract image prompt from Claude's response
           let aiImagePrompt = null;
-          const imgMatch = fullText.match(/---IMAGE_PROMPT---\s*([\s\S]*?)\s*---END_IMAGE_PROMPT---/);
-          if (imgMatch) {
+          
+          // Lấy nội dung nằm trong [IMAGE_PROMPT]...[/IMAGE_PROMPT] hoặc ---IMAGE_PROMPT---
+          const imgMatch = fullText.match(/\[IMAGE_PROMPT\]([\s\S]*?)\[\/IMAGE_PROMPT\]/i) || 
+                           fullText.match(/---IMAGE_PROMPT---([\s\S]*?)---END_IMAGE_PROMPT---/i) ||
+                           fullText.match(/IMAGE_PROMPT:([\s\S]*)$/i);
+                           
+          if (imgMatch && imgMatch[1]) {
             aiImagePrompt = imgMatch[1].trim();
           }
 
           // Send the clean text (without image prompt markers)
-          const cleanText = fullText.replace(/\s*---IMAGE_PROMPT---[\s\S]*?---END_IMAGE_PROMPT---\s*/g, '').trim();
+          let cleanText = fullText
+            .replace(/\s*\[IMAGE_PROMPT\][\s\S]*?\[\/IMAGE_PROMPT\]\s*/ig, '')
+            .replace(/\s*---IMAGE_PROMPT---[\s\S]*?---END_IMAGE_PROMPT---\s*/ig, '')
+            .trim();
 
           // Notify client that text is complete
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ textComplete: true, cleanText })}\n\n`));
