@@ -8,6 +8,7 @@ import {
   getContentIdeas, getProductInfo, getImagePrompt
 } from '@/lib/tea-knowledge';
 import { streamLLM } from '@/lib/llm';
+import { query } from '@/lib/db';
 
 // ─── Map user selections → internal keys ─────────────────────────────────────
 const GROUP_MAP = {
@@ -327,8 +328,7 @@ export async function POST(request) {
     userPrompt += `\n\nĐịnh dạng: ${content_format}\nGiọng điệu: ${tone || 'Thân thiện, gần gũi'}`;
 
     // Fetch custom training from database
-    const { query: dbQuery } = require('@/lib/db');
-    const trainingRes = await dbQuery('SELECT system_prompt FROM agent_training WHERE agent_id = $1', ['biz_content_creator']);
+    const trainingRes = await query('SELECT system_prompt FROM agent_training WHERE agent_id = $1', ['biz_content_creator']);
     const customTrainingPrompt = trainingRes.rows[0]?.system_prompt || '';
 
     // Search relevant knowledge base documents to inject as product/factual context
@@ -336,7 +336,7 @@ export async function POST(request) {
     let knowledgeContext = '';
     if (searchTerms.trim()) {
       const searchTermLike = `%${searchTerms.substring(0, 50)}%`;
-      const knowledgeRes = await dbQuery(
+      const knowledgeRes = await query(
         `SELECT title, content FROM knowledge_documents 
          WHERE is_active = true 
            AND (title ILIKE $1 OR content ILIKE $1)

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
 import { streamLLM } from '@/lib/llm';
+import { query } from '@/lib/db';
 
 export async function POST(request) {
   const session = await getSession();
@@ -9,11 +10,9 @@ export async function POST(request) {
   const { question } = await request.json();
   if (!question?.trim()) return NextResponse.json({ error: 'Câu hỏi không được để trống' }, { status: 400 });
 
-  const { query: dbQuery } = require('@/lib/db');
-
   // 1. Search matching FAQs
   const faqLike = `%${question.substring(0, 50)}%`;
-  const faqRes = await dbQuery(
+  const faqRes = await query(
     `SELECT question, answer FROM faqs 
      WHERE is_active = true 
        AND (question ILIKE $1 OR answer ILIKE $1)
@@ -22,7 +21,7 @@ export async function POST(request) {
   );
 
   // 2. Search matching general knowledge documents
-  const knowledgeRes = await dbQuery(
+  const knowledgeRes = await query(
     `SELECT title, content FROM knowledge_documents 
      WHERE is_active = true 
        AND (title ILIKE $1 OR content ILIKE $1)

@@ -3,6 +3,7 @@ import { getSession } from '@/lib/auth';
 import { getAgentById, buildPrompt } from '@/lib/agents';
 import { getAgentTraining } from '@/lib/training';
 import { streamLLM } from '@/lib/llm';
+import { query } from '@/lib/db';
 
 export async function POST(request) {
   // Auth check
@@ -29,8 +30,7 @@ export async function POST(request) {
     const prompt = buildPrompt(agent, formData);
     
     // Fetch system prompt and relevant knowledge from database
-    const { query: dbQuery } = require('@/lib/db');
-    const trainingRes = await dbQuery('SELECT system_prompt FROM agent_training WHERE agent_id = $1', [agentId]);
+    const trainingRes = await query('SELECT system_prompt FROM agent_training WHERE agent_id = $1', [agentId]);
     const systemPromptBase = trainingRes.rows[0]?.system_prompt || '';
 
     // Collect all text from formData for searching
@@ -41,7 +41,7 @@ export async function POST(request) {
     let knowledgeContext = '';
     if (searchTerms.trim()) {
       const searchTermLike = `%${searchTerms.substring(0, 50)}%`;
-      const knowledgeRes = await dbQuery(
+      const knowledgeRes = await query(
         `SELECT title, content FROM knowledge_documents 
          WHERE is_active = true 
            AND (title ILIKE $1 OR content ILIKE $1)
