@@ -1,0 +1,107 @@
+[
+  {
+    "id": "faq_001",
+    "category": "Sản phẩm",
+    "question": "Trà hoa cúc mật ong có tác dụng gì?",
+    "answer": "Trà Hoa Cúc Mật Ong có các tác dụng chính: (1) Giúp thư giãn, giảm căng thẳng và lo lắng, (2) Hỗ trợ giấc ngủ ngon tự nhiên, (3) Kháng viêm, tốt cho hệ tiêu hóa, (4) Giàu chất chống oxy hóa, làm đẹp da, (5) Tăng cường hệ miễn dịch. Sản phẩm phù hợp với mọi lứa tuổi, đặc biệt người bận rộn, hay stress.",
+    "tags": ["hoa cúc", "mật ong", "tác dụng", "công dụng"]
+  },
+  {
+    "id": "faq_002",
+    "category": "Sản phẩm",
+    "question": "Trà có đường không? Người tiểu đường có uống được không?",
+    "answer": "Trà Hoa Cúc Mật Ong của chúng tôi KHÔNG thêm đường công nghiệp. Vị ngọt tự nhiên đến từ mật ong nguyên chất. Người tiểu đường type 2 có thể dùng với lượng vừa phải (1-2 gói/ngày). Tuy nhiên khuyến nghị hỏi ý kiến bác sĩ trước khi sử dụng thường xuyên vì mật ong vẫn có tác động đến đường huyết.",
+    "tags": ["đường", "tiểu đường", "mật ong", "an toàn"]
+  },
+  {
+    "id": "faq_003",
+    "category": "Sản phẩm",
+    "question": "Sản phẩm có chứng nhận an toàn thực phẩm không?",
+    "answer": "Có. Tất cả sản phẩm Trà Dược Việt Nam đều có: (1) Giấy chứng nhận VSATTP từ Bộ Y tế, (2) Giấy chứng nhận công bố sản phẩm, (3) Kiểm nghiệm định kỳ tại các phòng lab được công nhận. Khách hàng có thể yêu cầu xem giấy chứng nhận tại bất kỳ thời điểm nào.",
+    "tags": ["chứng nhận", "an toàn thực phẩm", "VSATTP", "giấy phép"]
+  },
+  {
+    "id": "faq_004",
+    "category": "Sản phẩm",
+    "question": "Hạn sử dụng của sản phẩm là bao lâu?",
+    "answer": "Hạn sử dụng: (1) Trà túi lọc: 24 tháng kể từ ngày sản xuất, (2) Trà rời: 18 tháng, (3) Trà đóng hộp quà: 24 tháng. Bảo quản nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp. Sau khi mở, dùng trong vòng 3 tháng và bảo quản kín.",
+    "tags": ["hạn sử dụng", "bảo quản", "date"]
+  },
+  {
+    "id": "faq_005",
+    "category": "Đơn hàng & Giao hàng",
+    "question": "Thời gian giao hàng mất bao lâu?",
+    "answer": "Thời gian giao hàng dự kiến: (1) Nội thành Hà Nội & TP.HCM: 1-2 ngày làm việc, (2) Tỉnh thành khác: 3-5 ngày làm việc, (3) Vùng sâu vùng xa: 5-7 ngày làm việc. Đơn hàng được xử lý trong ngày nếu đặt trước 14h. Khách hàng sẽ nhận được mã vận đơn qua SMS/Zalo sau khi đơn được xuất kho.",
+    "tags": ["giao hàng", "thời gian", "ship", "vận chuyển"]
+  },
+  {
+    "id": "faq_006",
+    "category": "Đơn hàng & Giao hàng",
+    "question": "Phí vận chuyển là bao nhiêu?",
+    "answer": "Chính sách phí vận chuyển: (1) Miễn phí vận chuyển toàn quốc cho đơn từ 300.000đ trở lên, (2) Đơn dưới 300.000đ: phí ship 25.000-35.000đ tùy khu vực, (3) Hỏa tốc nội thành HN & HCM: phụ phí 30.000đ, (4) Đối với đại lý: áp dụng chính sách riêng.",
+    "tags": ["phí ship", "phí vận chuyển", "miễn phí", "freeship"]
+  },
+  {
+    "id": "faq_007",
+    "category": "Đơn hàng & Giao hàng",
+    "question": "Tôi có thể theo dõi đơn hàng ở đâu?",
+    "answer": "Khách hàng có thể theo dõi đơn hàng qua: (1) Link tracking được gửi qua SMS/Zalo sau khi xuất kho, (2) Website của đơn vị vận chuyển (GHTK, GHN, ViettelPost), (3) Nhắn tin trực tiếp cho fanpage/Zalo OA của cửa hàng. Nếu sau 24h không nhận được mã vận đơn, liên hệ CSKH để được hỗ trợ.",
+    "tags": ["theo dõi đơn", "tracking", "mã vận đơn", "trạng thái đơn hàng"]
+  },
+  {
+    "id": "faq_008",
+    "category": "Đổi trả & Hoàn tiền",
+    "question": "Chính sách đổi trả như thế nào?",
+    "answer": "Chính sách đổi trả trong 7 ngày kể từ ngày nhận hàng với điều kiện: (1) Sản phẩm lỗi do nhà sản xuất (vỡ, rò rỉ, sai sản phẩm), (2) Sản phẩm chưa qua sử dụng, còn nguyên seal, (3) Có ảnh/video kiểm chứng lỗi. KHÔNG nhận đổi trả nếu: khách đổi ý, đã dùng quá 1/3 sản phẩm. Quy trình: Chụp ảnh lỗi → Liên hệ CSKH → Xác nhận → Gửi lại → Đổi mới hoặc hoàn tiền.",
+    "tags": ["đổi trả", "hoàn tiền", "lỗi sản phẩm", "bảo hành"]
+  },
+  {
+    "id": "faq_009",
+    "category": "Đổi trả & Hoàn tiền",
+    "question": "Hoàn tiền mất bao lâu?",
+    "answer": "Thời gian hoàn tiền sau khi xác nhận đổi trả hợp lệ: (1) Chuyển khoản ngân hàng: 1-3 ngày làm việc, (2) Ví điện tử (Momo, ZaloPay): 24-48 giờ, (3) Hoàn vào tài khoản sàn TMĐT: theo quy định từng sàn (3-7 ngày). Lưu ý: Phí vận chuyển hoàn hàng do công ty chịu trong trường hợp lỗi từ phía công ty.",
+    "tags": ["hoàn tiền", "refund", "thời gian hoàn", "ngân hàng"]
+  },
+  {
+    "id": "faq_010",
+    "category": "Khuyến mãi & Giá",
+    "question": "Có chương trình mua nhiều giảm giá không?",
+    "answer": "Chương trình giảm giá theo số lượng: (1) Mua 2-4 hộp: giảm 5%, (2) Mua 5-9 hộp: giảm 10%, (3) Mua 10-19 hộp: giảm 15%, (4) Mua từ 20 hộp (sỉ): liên hệ để được báo giá đặc biệt. Ngoài ra còn có chương trình tích điểm thành viên và combo mix sản phẩm. Khuyến mãi có thể thay đổi theo từng thời điểm.",
+    "tags": ["giảm giá", "mua sỉ", "khuyến mãi", "combo", "giá"]
+  },
+  {
+    "id": "faq_011",
+    "category": "Khuyến mãi & Giá",
+    "question": "Mã giảm giá áp dụng như thế nào?",
+    "answer": "Cách dùng mã giảm giá: (1) Nhập mã vào ô 'Mã khuyến mãi' khi thanh toán trên website/app, (2) Nhắn mã cho CSKH nếu đặt qua Zalo/Facebook, (3) Mỗi mã chỉ dùng 1 lần/tài khoản trừ khi có ghi chú khác, (4) Không áp dụng đồng thời 2 mã, (5) Mã không có giá trị quy đổi thành tiền mặt. Mã hết hạn sẽ không thể sử dụng dù đơn hàng đã tạo.",
+    "tags": ["mã giảm giá", "voucher", "coupon", "áp dụng"]
+  },
+  {
+    "id": "faq_012",
+    "category": "Đại lý & Hợp tác",
+    "question": "Điều kiện trở thành đại lý là gì?",
+    "answer": "Điều kiện đăng ký đại lý: (1) Đơn hàng đầu tiên tối thiểu 5 triệu đồng, (2) Cam kết doanh số tối thiểu 10 triệu/tháng, (3) Có mặt bằng kinh doanh hoặc kênh online uy tín, (4) Ký kết hợp đồng đại lý. Quyền lợi đại lý: chiết khấu 20-30%, được hỗ trợ POSM, ưu tiên nhận hàng mới, có nhân viên kinh doanh phụ trách riêng.",
+    "tags": ["đại lý", "hợp tác", "chiết khấu", "đăng ký đại lý"]
+  },
+  {
+    "id": "faq_013",
+    "category": "Đại lý & Hợp tác",
+    "question": "Công ty có hỗ trợ marketing cho đại lý không?",
+    "answer": "Hỗ trợ marketing cho đại lý bao gồm: (1) Cung cấp ảnh sản phẩm, video chất lượng cao miễn phí, (2) Template thiết kế banner, poster, story theo mùa, (3) Nội dung caption sẵn sàng đăng mạng xã hội, (4) Hỗ trợ chạy ads Facebook/TikTok (chia sẻ chi phí với đại lý đạt doanh số tốt), (5) Đào tạo kỹ năng bán hàng online định kỳ.",
+    "tags": ["marketing", "hỗ trợ đại lý", "ảnh sản phẩm", "quảng cáo"]
+  },
+  {
+    "id": "faq_014",
+    "category": "Sử dụng sản phẩm",
+    "question": "Pha trà đúng cách như thế nào?",
+    "answer": "Hướng dẫn pha trà chuẩn: (1) Nước sôi 90-95°C (không dùng nước sôi 100°C vì làm mất hoạt chất), (2) Ngâm túi trà 3-5 phút, (3) Có thể thêm mật ong hoặc chanh theo khẩu vị, (4) Uống ngay sau khi pha để giữ hương vị tốt nhất. Có thể pha lạnh: ngâm trong nước lạnh 6-8 tiếng trong tủ lạnh. Uống 1-2 tách/ngày.",
+    "tags": ["pha trà", "cách dùng", "hướng dẫn", "nhiệt độ"]
+  },
+  {
+    "id": "faq_015",
+    "category": "Sử dụng sản phẩm",
+    "question": "Phụ nữ mang thai có uống được không?",
+    "answer": "Phụ nữ mang thai cần thận trọng: (1) Trà Hoa Cúc: có thể dùng lượng nhỏ (1 tách/ngày) nhưng tránh 3 tháng đầu thai kỳ, (2) Một số loại thảo dược khác trong danh mục: cần tham khảo bác sĩ trước khi dùng. Khuyến nghị chung: luôn hỏi ý kiến bác sĩ sản khoa trước khi dùng bất kỳ thực phẩm chức năng nào khi mang thai.",
+    "tags": ["mang thai", "bà bầu", "an toàn", "thai kỳ"]
+  }
+]

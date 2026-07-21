@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Style 6 - Pastel Soft</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Quicksand', sans-serif; background: #FFF5F7; padding: 50px 20px; min-height: 100vh; }
+.canvas { max-width: 1100px; margin: 0 auto; background: #FFFFFF; border-radius: 40px; padding: 50px 40px; box-shadow: 0 20px 60px rgba(244, 114, 182, 0.15); }
+.hero { text-align: center; margin-bottom: 50px; }
+.badge { display: inline-block; padding: 8px 20px; background: linear-gradient(90deg, #FBCFE8, #FED7AA); color: #BE185D; border-radius: 30px; font-size: 12px; font-weight: 700; letter-spacing: 1px; margin-bottom: 16px; }
+.hero h1 { font-size: 38px; font-weight: 700; color: #831843; margin-bottom: 10px; }
+.hero p { font-size: 14px; color: #9D174D; }
+.flow { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+.step { background: #FFFFFF; border-radius: 24px; padding: 28px 24px; position: relative; box-shadow: 0 8px 24px rgba(0,0,0,0.06); transition: all 0.3s; }
+.step:hover { transform: translateY(-6px); box-shadow: 0 16px 40px rgba(244, 114, 182, 0.2); }
+.step:nth-child(6n+1) { background: linear-gradient(135deg, #FCE7F3 0%, #FFFFFF 100%); }
+.step:nth-child(6n+2) { background: linear-gradient(135deg, #DBEAFE 0%, #FFFFFF 100%); }
+.step:nth-child(6n+3) { background: linear-gradient(135deg, #D1FAE5 0%, #FFFFFF 100%); }
+.step:nth-child(6n+4) { background: linear-gradient(135deg, #FEF3C7 0%, #FFFFFF 100%); }
+.step:nth-child(6n+5) { background: linear-gradient(135deg, #E0E7FF 0%, #FFFFFF 100%); }
+.step:nth-child(6n) { background: linear-gradient(135deg, #FED7AA 0%, #FFFFFF 100%); }
+.step-icon-wrap { display: flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+.step-icon { width: 56px; height: 56px; background: white; border-radius: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+.step-icon svg { width: 32px; height: 32px; }
+.step-num { font-size: 36px; font-weight: 700; color: rgba(190, 24, 93, 0.15); }
+.step-title { font-size: 16px; font-weight: 700; color: #831843; margin-bottom: 8px; }
+.step-desc { font-size: 13px; color: #9D174D; line-height: 1.6; }
+.actor { display: inline-block; margin-top: 12px; padding: 4px 12px; background: white; border-radius: 12px; font-size: 11px; color: #BE185D; font-weight: 600; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="hero">
+    <span class="badge">✨ SOFT PASTEL EDITION ✨</span>
+    <h1>Quy Trình Mua Hàng</h1>
+    <p>Phòng Mua hàng & Kế toán | 6 bước đơn giản</p>
+  </div>
+  <div class="flow">
+    <div class="step">
+      <div class="step-icon-wrap">
+        <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#BE185D" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2"/></svg></div>
+        <div class="step-num">01</div>
+      </div>
+      <div class="step-title">Lập đề xuất</div>
+      <p class="step-desc">Nhân viên tạo đề xuất mua hàng chi tiết với sản phẩm, số lượng, lý do</p>
+      <span class="actor">👤 Phòng yêu cầu</span>
+    </div>
+    <div class="step">
+      <div class="step-icon-wrap">
+        <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+        <div class="step-num">02</div>
+      </div>
+      <div class="step-title">Tìm NCC</div>
+      <p class="step-desc">Tìm kiếm, khảo sát các nhà cung cấp phù hợp trên thị trường</p>
+      <span class="actor">🔍 Phòng mua hàng</span>
+    </div>
+    <div class="step">
+      <div class="step-icon-wrap">
+        <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="step-num">03</div>
+      </div>
+      <div class="step-title">Báo giá</div>
+      <p class="step-desc">Nhận và so sánh báo giá từ nhiều nhà cung cấp</p>
+      <span class="actor">💼 Phòng mua hàng</span>
+    </div>
+    <div class="step">
+      <div class="step-icon-wrap">
+        <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="step-num">04</div>
+      </div>
+      <div class="step-title">Phê duyệt</div>
+      <p class="step-desc">Quản lý phê duyệt đề xuất và lựa chọn nhà cung cấp tối ưu</p>
+      <span class="actor">✅ Trưởng phòng</span>
+    </div>
+    <div class="step">
+      <div class="step-icon-wrap">
+        <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4338CA" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div class="step-num">05</div>
+      </div>
+      <div class="step-title">Ký hợp đồng</div>
+      <p class="step-desc">Soạn thảo và ký kết hợp đồng mua bán với nhà cung cấp</p>
+      <span class="actor">📝 Pháp chế</span>
+    </div>
+    <div class="step">
+      <div class="step-icon-wrap">
+        <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#C2410C" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+        <div class="step-num">06</div>
+      </div>
+      <div class="step-title">Thanh toán</div>
+      <p class="step-desc">Thực hiện thanh toán và hoàn tất quy trình mua hàng</p>
+      <span class="actor">💰 Kế toán</span>
+    </div>
+  </div>
+</div>
+</body>
+</html>

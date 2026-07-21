@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Style 4 - Creative Gradient</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Outfit', sans-serif; background: #0F0F23; padding: 40px 20px; min-height: 100vh; color: white; }
+.canvas { max-width: 1200px; margin: 0 auto; padding: 50px 40px; position: relative; }
+.bg-blob-1 { position: absolute; top: -100px; left: -100px; width: 400px; height: 400px; background: radial-gradient(circle, #EC4899 0%, transparent 70%); opacity: 0.3; filter: blur(60px); }
+.bg-blob-2 { position: absolute; bottom: -100px; right: -100px; width: 400px; height: 400px; background: radial-gradient(circle, #8B5CF6 0%, transparent 70%); opacity: 0.3; filter: blur(60px); }
+.content { position: relative; z-index: 1; }
+.hero { text-align: center; margin-bottom: 60px; }
+.tag { display: inline-block; padding: 8px 24px; background: linear-gradient(90deg, #EC4899, #8B5CF6); border-radius: 30px; font-size: 12px; font-weight: 700; letter-spacing: 2px; margin-bottom: 20px; box-shadow: 0 8px 20px rgba(236, 72, 153, 0.4); }
+.hero h1 { font-size: 52px; font-weight: 800; background: linear-gradient(90deg, #F472B6 0%, #A78BFA 50%, #60A5FA 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin-bottom: 12px; }
+.hero p { font-size: 16px; color: rgba(255,255,255,0.7); }
+.flow { display: flex; flex-direction: column; gap: 24px; }
+.step { display: flex; align-items: center; gap: 24px; padding: 28px; background: rgba(255,255,255,0.05); border-radius: 24px; border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); transition: all 0.4s; position: relative; overflow: hidden; }
+.step::before { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%); transform: translateX(-100%); transition: transform 0.6s; }
+.step:hover::before { transform: translateX(100%); }
+.step:hover { transform: translateX(8px); border-color: rgba(236, 72, 153, 0.5); }
+.step-num { width: 70px; height: 70px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: 800; flex-shrink: 0; }
+.step:nth-child(1) .step-num { background: linear-gradient(135deg, #F472B6, #EC4899); }
+.step:nth-child(2) .step-num { background: linear-gradient(135deg, #A78BFA, #8B5CF6); }
+.step:nth-child(3) .step-num { background: linear-gradient(135deg, #60A5FA, #3B82F6); }
+.step:nth-child(4) .step-num { background: linear-gradient(135deg, #34D399, #10B981); }
+.step:nth-child(5) .step-num { background: linear-gradient(135deg, #FBBF24, #F59E0B); }
+.step:nth-child(6) .step-num { background: linear-gradient(135deg, #F87171, #EF4444); }
+.step-icon { width: 70px; height: 70px; background: rgba(255,255,255,0.1); border-radius: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.step-icon svg { width: 40px; height: 40px; stroke: white; }
+.step-content { flex: 1; }
+.step-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+.step-desc { font-size: 14px; color: rgba(255,255,255,0.7); line-height: 1.5; }
+.step-meta { display: flex; gap: 12px; margin-top: 12px; }
+.meta-badge { padding: 4px 12px; background: rgba(255,255,255,0.1); border-radius: 12px; font-size: 11px; color: rgba(255,255,255,0.8); }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="bg-blob-1"></div>
+  <div class="bg-blob-2"></div>
+  <div class="content">
+    <div class="hero">
+      <span class="tag">CREATIVE WORKFLOW</span>
+      <h1>Quy Trình Chọn NCC</h1>
+      <p>Phòng Mua hàng & Kế toán | 6 bước</p>
+    </div>
+    <div class="flow">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+        <div class="step-content">
+          <div class="step-title">Xác định yêu cầu</div>
+          <p class="step-desc">Phòng ban gửi yêu cầu mua hàng với thông số kỹ thuật, số lượng, ngân sách</p>
+          <div class="step-meta"><span class="meta-badge">📅 Deadline: 3 ngày</span><span class="meta-badge">👤 Phòng Yêu cầu</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+        <div class="step-content">
+          <div class="step-title">Tìm kiếm NCC tiềm năng</div>
+          <p class="step-desc">Tìm kiếm trên database, internet, qua giới thiệu; lập danh sách 3-5 NCC</p>
+          <div class="step-meta"><span class="meta-badge">📊 Số NCC: 3-5</span><span class="meta-badge">👤 Phòng Mua hàng</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div class="step-content">
+          <div class="step-title">Gửi yêu cầu báo giá (RFQ)</div>
+          <p class="step-desc">Gửi thông số kỹ thuật cho từng NCC và nhận báo giá chi tiết</p>
+          <div class="step-meta"><span class="meta-badge">⏰ Thời gian: 5-7 ngày</span><span class="meta-badge">👤 Phòng Mua hàng</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg></div>
+        <div class="step-content">
+          <div class="step-title">Đánh giá & so sánh</div>
+          <p class="step-desc">So sánh giá, chất lượng, uy tín, khả năng giao hàng của các NCC</p>
+          <div class="step-meta"><span class="meta-badge">📈 Tiêu chí: 5 yếu tố</span><span class="meta-badge">👤 Tổ Mua hàng</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div class="step-content">
+          <div class="step-title">Phê duyệt chọn NCC</div>
+          <p class="step-desc">Trưởng phòng/Kế toán trưởng phê duyệt NCC được chọn</p>
+          <div class="step-meta"><span class="meta-badge">✅ Quyết định</span><span class="meta-badge">👤 Kế toán trưởng</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">06</div>
+        <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+        <div class="step-content">
+          <div class="step-title">Thông báo & Ký HĐ</div>
+          <p class="step-desc">Thông báo cho NCC, soạn và ký kết hợp đồng mua hàng</p>
+          <div class="step-meta"><span class="meta-badge">📝 Hoàn tất</span><span class="meta-badge">👤 Phòng Mua + KT</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Style 5 - Technical Flow</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Inter', sans-serif; background: #0A0F1E; padding: 40px 20px; min-height: 100vh; color: #E2E8F0; }
+.canvas { max-width: 1300px; margin: 0 auto; padding: 40px; background: linear-gradient(180deg, #0F172A 0%, #1E293B 100%); border-radius: 16px; border: 1px solid #334155; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5); }
+.header { display: flex; align-items: center; gap: 16px; padding-bottom: 24px; border-bottom: 1px solid #1E293B; margin-bottom: 32px; }
+.terminal-dots { display: flex; gap: 6px; }
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.dot:nth-child(1) { background: #EF4444; }
+.dot:nth-child(2) { background: #F59E0B; }
+.dot:nth-child(3) { background: #10B981; }
+.terminal-path { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: #64748B; flex: 1; }
+.title-section { flex: 1; }
+.title { font-family: 'JetBrains Mono', monospace; font-size: 22px; font-weight: 700; color: #22C55E; }
+.subtitle { font-size: 12px; color: #94A3B8; font-family: 'JetBrains Mono', monospace; }
+.flow { display: flex; flex-direction: column; gap: 0; }
+.step { display: flex; align-items: stretch; gap: 0; margin-bottom: 0; }
+.step-line { width: 40px; display: flex; flex-direction: column; align-items: center; }
+.step-line-circle { width: 28px; height: 28px; background: #22C55E; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #0F172A; font-weight: 700; font-size: 12px; margin: 12px 0; box-shadow: 0 0 16px rgba(34, 197, 94, 0.5); }
+.step-line-connector { width: 2px; flex: 1; background: linear-gradient(to bottom, #22C55E 0%, #3B82F6 100%); }
+.step-card { flex: 1; padding: 16px 20px; background: #1E293B; border-radius: 8px; border-left: 3px solid #22C55E; margin: 8px 16px 12px 0; transition: all 0.3s; }
+.step-card:hover { background: #334155; border-left-color: #3B82F6; }
+.step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.step-title { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 600; color: #E2E8F0; }
+.step-time { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: #94A3B8; padding: 2px 8px; background: #0F172A; border-radius: 4px; }
+.step-desc { font-size: 13px; color: #CBD5E1; line-height: 1.5; }
+.step-meta { display: flex; gap: 12px; margin-top: 8px; }
+.meta-tag { font-family: 'JetBrains Mono', monospace; font-size: 10px; padding: 2px 8px; border-radius: 4px; background: #0F172A; color: #94A3B8; border: 1px solid #334155; }
+.meta-tag.actor { background: #1E3A8A; color: #93C5FD; border-color: #3B82F6; }
+.footer { margin-top: 24px; padding: 16px; background: #0F172A; border-radius: 8px; border: 1px solid #1E293B; font-family: 'JetBrains Mono', monospace; font-size: 12px; color: #64748B; }
+.footer-prompt { color: #22C55E; }
+</style>
+</head>
+<body>
+<div class="canvas">
+  <div class="header">
+    <div class="terminal-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+    <div class="terminal-path">~/workflow/finance/</div>
+    <div class="title-section">
+      <div class="title">> quy_trinh_thanh_toan_cong_no.flow</div>
+      <div class="subtitle">FINANCE_WORKFLOW_v2.1.0 | last_updated: 2025-01-15</div>
+    </div>
+  </div>
+  <div class="flow">
+    <div class="step">
+      <div class="step-line"><div class="step-line-circle">01</div><div class="step-line-connector"></div></div>
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-title">fn_init_payment()</div>
+          <span class="step-time">~2min</span>
+        </div>
+        <div class="step-desc">Khởi tạo yêu cầu thanh toán từ phòng ban, lấy thông tin từ hệ thống ERP</div>
+        <div class="step-meta">
+          <span class="meta-tag actor">@accountant</span>
+          <span class="meta-tag">input: invoice_id</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-line"><div class="step-line-circle">02</div><div class="step-line-connector"></div></div>
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-title">validate_documents()</div>
+          <span class="step-time">~5min</span>
+        </div>
+        <div class="step-desc">Kiểm tra tính đầy đủ của chứng từ: hóa đơn, hợp đồng, đề nghị thanh toán</div>
+        <div class="step-meta">
+          <span class="meta-tag actor">@chief_accountant</span>
+          <span class="meta-tag">check: docs.valid</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-line"><div class="step-line-circle">03</div><div class="step-line-connector"></div></div>
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-title">decision: amount &gt; 50M?</div>
+          <span class="step-time">~instant</span>
+        </div>
+        <div class="step-desc">Phân luồng duyệt theo giá trị: dưới 50M do KT Trưởng duyệt, trên 50M cần CFO</div>
+        <div class="step-meta">
+          <span class="meta-tag actor">@system</span>
+          <span class="meta-tag">branch: true/false</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-line"><div class="step-line-circle">04</div><div class="step-line-connector"></div></div>
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-title">approve_payment()</div>
+          <span class="step-time">~1day</span>
+        </div>
+        <div class="step-desc">Ký duyệt thanh toán trên hệ thống số, ghi nhận thời gian và người duyệt</div>
+        <div class="step-meta">
+          <span class="meta-tag actor">@cfo</span>
+          <span class="meta-tag">output: approval_id</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-line"><div class="step-line-circle">05</div><div class="step-line-connector"></div></div>
+      <div class="step-card">
+        <div class="step-header">
+          <div class="step-title">execute_transfer()</div>
+          <span class="step-time">~10min</span>
+        </div>
+        <div class="step-desc">Thực hiện chuyển khoản qua ngân hàng, ghi nhận giao dịch vào sổ quỹ</div>
+        <div class="step-meta">
+          <span class="meta-tag actor">@treasurer</span>
+          <span class="meta-tag">api: bank.transfer</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-line"><div class="step-line-circle">06</div></div>
+      <div class="step-card" style="border-left-color: #22C55E;">
+        <div class="step-header">
+          <div class="step-title">return SUCCESS ✓</div>
+          <span class="step-time">done</span>
+        </div>
+        <div class="step-desc">Hoàn tất quy trình, đóng hồ sơ, gửi thông báo cho phòng ban yêu cầu</div>
+        <div class="step-meta">
+          <span class="meta-tag actor">@system</span>
+          <span class="meta-tag">status: completed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer">
+    <div><span class="footer-prompt">$</span> workflow executed successfully</div>
+    <div style="margin-top: 4px; color: #475569;">exit_code: 0 | timestamp: 2025-01-15T10:30:00</div>
+  </div>
+</div>
+</body>
+</html>

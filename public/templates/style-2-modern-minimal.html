@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Style 2 - Modern Minimal</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Plus Jakarta Sans', sans-serif; background: #FAFAF9; padding: 50px 20px; }
+.container { max-width: 1200px; margin: 0 auto; }
+.hero { text-align: center; margin-bottom: 60px; }
+.tag { display: inline-block; padding: 8px 20px; background: #FEF3C7; color: #92400E; border-radius: 30px; font-size: 12px; font-weight: 700; letter-spacing: 2px; margin-bottom: 20px; }
+.hero h1 { font-size: 48px; font-weight: 800; color: #0F172A; margin-bottom: 12px; }
+.hero p { font-size: 16px; color: #64748B; }
+.flow-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; position: relative; }
+.step { background: #fff; border-radius: 24px; padding: 32px 24px; position: relative; transition: all 0.4s; border: 1px solid #F1F5F9; }
+.step:hover { transform: translateY(-8px); box-shadow: 0 20px 40px rgba(0,0,0,0.08); }
+.step-icon { width: 56px; height: 56px; border-radius: 16px; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+.step-icon svg { width: 32px; height: 32px; }
+.step-num { position: absolute; top: 16px; right: 20px; font-size: 36px; font-weight: 800; color: #F1F5F9; }
+.step-title { font-size: 16px; font-weight: 700; color: #0F172A; margin-bottom: 8px; }
+.step-desc { font-size: 13px; color: #64748B; line-height: 1.6; }
+.step:nth-child(1) .step-icon { background: #FEF3C7; }
+.step:nth-child(2) .step-icon { background: #DBEAFE; }
+.step:nth-child(3) .step-icon { background: #D1FAE5; }
+.step:nth-child(4) .step-icon { background: #FCE7F3; }
+.step:nth-child(5) .step-icon { background: #E0E7FF; }
+.step:nth-child(6) .step-icon { background: #FEF3C7; }
+.step:nth-child(7) .step-icon { background: #DBEAFE; }
+.step:nth-child(8) .step-icon { background: #D1FAE5; }
+.connector { display: flex; align-items: center; justify-content: center; padding: 12px 0; }
+.connector svg { width: 24px; height: 24px; color: #CBD5E1; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="hero">
+    <span class="tag">QUY TRÌNH VẬN HÀNH</span>
+    <h1>Quy Trình Mua Hàng</h1>
+    <p>8 bước chuẩn | Cập nhật 2025</p>
+  </div>
+  <div class="flow-grid">
+    <div class="step">
+      <span class="step-num">01</span>
+      <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/></svg></div>
+      <div class="step-title">Đề xuất mua hàng</div>
+      <p class="step-desc">Nhân viên tạo đề xuất với thông tin sản phẩm, số lượng, lý do mua</p>
+    </div>
+    <div class="step">
+      <span class="step-num">02</span>
+      <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg></div>
+      <div class="step-title">Tìm nhà cung cấp</div>
+      <p class="step-desc">Khảo sát, so sánh giá và chất lượng từ nhiều NCC</p>
+    </div>
+    <div class="step">
+      <span class="step-num">03</span>
+      <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></div>
+      <div class="step-title">Báo giá</div>
+      <p class="step-desc">Nhận và đánh giá báo giá từ các NCC</p>
+    </div>
+    <div class="step">
+      <span class="step-num">04</span>
+      <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#BE185D" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="step-title">Phê duyệt</div>
+      <p class="step-desc">Quản lý phê duyệt đề xuất và chọn NCC</p>
+    </div>
+    <div class="step">
+      <span class="step-num">05</span>
+      <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#4338CA" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></div>
+      <div class="step-title">Ký hợp đồng</div>
+      <p class="step-desc">Soạn thảo và ký kết hợp đồng với NCC</p>
+    </div>
+    <div class="step">
+      <span class="step-num">06</span>
+      <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg></div>
+      <div class="step-title">Đặt hàng</div>
+      <p class="step-desc">Gửi đơn đặt hàng chính thức cho NCC</p>
+    </div>
+    <div class="step">
+      <span class="step-num">07</span>
+      <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#1E40AF" stroke-width="2"><path d="M16 3h5v5M14 10l7-7M9 21H4a2 2 0 0 1-2-2v-5M3 9V4a2 2 0 0 1 2-2h5M21 16v3a2 2 0 0 1-2 2h-5M15 15l6 6"/></svg></div>
+      <div class="step-title">Nhận hàng</div>
+      <p class="step-desc">Kiểm tra hàng hóa khi nhận, đối chiếu đơn hàng</p>
+    </div>
+    <div class="step">
+      <span class="step-num">08</span>
+      <div class="step-icon"><svg viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></div>
+      <div class="step-title">Thanh toán</div>
+      <p class="step-desc">Thanh toán và ghi nhận chi phí vào sổ sách</p>
+    </div>
+  </div>
+</div>
+</body>
+</html>
