@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start -p 3900",
+    "start": "next start -p 3950",
     "seed": "node lib/seed-users.mjs",
     "seed:pg": "node lib/seed-users-pg.mjs"
   },
