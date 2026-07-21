@@ -326,8 +326,30 @@ export async function POST(request) {
     }
     userPrompt += `\n\nĐịnh dạng: ${content_format}\nGiọng điệu: ${tone || 'Thân thiện, gần gũi'}`;
 
-    // Check for custom training
-    const training = getAgentTraining('biz_content_creator');
+    // Fetch custom training from database
+    const { query: dbQuery } = require('@/lib/db');
+    const trainingRes = await dbQuery('SELECT system_prompt FROM agent_training WHERE agent_id = $1', ['biz_content_creator']);
+    const customTrainingPrompt = trainingRes.rows[0]?.system_prompt || '';
+
+    // Search relevant knowledge base documents to inject as product/factual context
+    const searchTerms = [product_line, custom_topic].filter(Boolean).join(' ');
+    let knowledgeContext = '';
+    if (searchTerms.trim()) {
+      const searchTermLike = `%${searchTerms.substring(0, 50)}%`;
+      const knowledgeRes = await dbQuery(
+        `SELECT title, content FROM knowledge_documents 
+         WHERE is_active = true 
+           AND (title ILIKE $1 OR content ILIKE $1)
+         LIMIT 2`,
+        [searchTermLike]
+      );
+      if (knowledgeRes.rows.length > 0) {
+        knowledgeContext = "\n\nDỮ LIỆU KIẾN THỨC SẢN PHẨM NỘI BỘ ĐỂ TRÍCH XUẤT THÔNG TIN CHÍNH XÁC:\n" + 
+          knowledgeRes.rows.map(r => `[Tài liệu: ${r.title}]\n${r.content}`).join('\n\n');
+      }
+    }
+
+    const finalSystemPrompt = `${systemPrompt}\n${customTrainingPrompt}\n${knowledgeContext}`.trim();
 
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
@@ -337,9 +359,7 @@ export async function POST(request) {
           let fullText = '';
           let sentText = '';
           await streamLLM({
-            systemPrompt: training?.systemPrompt
-              ? `${systemPrompt}\n\n${training.systemPrompt}`
-              : systemPrompt,
+            systemPrompt: finalSystemPrompt,
             userPrompt,
             onChunk(chunk) {
               fullText += chunk;

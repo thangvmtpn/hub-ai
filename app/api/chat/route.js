@@ -27,7 +27,34 @@ export async function POST(request) {
 
     // Build prompt
     const prompt = buildPrompt(agent, formData);
-    const training = getAgentTraining(agentId);
+    
+    // Fetch system prompt and relevant knowledge from database
+    const { query: dbQuery } = require('@/lib/db');
+    const trainingRes = await dbQuery('SELECT system_prompt FROM agent_training WHERE agent_id = $1', [agentId]);
+    const systemPromptBase = trainingRes.rows[0]?.system_prompt || '';
+
+    // Collect all text from formData for searching
+    const searchTerms = Object.values(formData || {})
+      .filter(v => typeof v === 'string' && v.trim().length > 2)
+      .join(' ');
+    
+    let knowledgeContext = '';
+    if (searchTerms.trim()) {
+      const searchTermLike = `%${searchTerms.substring(0, 50)}%`;
+      const knowledgeRes = await dbQuery(
+        `SELECT title, content FROM knowledge_documents 
+         WHERE is_active = true 
+           AND (title ILIKE $1 OR content ILIKE $1)
+         LIMIT 3`,
+        [searchTermLike]
+      );
+      if (knowledgeRes.rows.length > 0) {
+        knowledgeContext = "\n\nDỮ LIỆU KIẾN THỨC NỘI BỘ LIÊN QUAN ĐỂ THAM KHẢO:\n" + 
+          knowledgeRes.rows.map(r => `[Tài liệu: ${r.title}]\n${r.content}`).join('\n\n');
+      }
+    }
+
+    const finalSystemPrompt = `${systemPromptBase}\n${knowledgeContext}`.trim();
 
     // Call LLM with streaming (Claude with OpenAI fallback)
     const encoder = new TextEncoder();
@@ -35,7 +62,7 @@ export async function POST(request) {
       async start(controller) {
         try {
           await streamLLM({
-            systemPrompt: training?.systemPrompt || '',
+            systemPrompt: finalSystemPrompt,
             userPrompt: prompt,
             onChunk(chunk) {
               controller.enqueue(encoder.encode(`data: ${JSON.stringify({ text: chunk })}\n\n`));

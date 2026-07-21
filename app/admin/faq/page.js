@@ -67,6 +67,19 @@ export default function FaqAdminPage() {
       </header>
 
       <div className="p-6 max-w-5xl mx-auto">
+        {/* Navigation Tabs */}
+        <div className="flex gap-6 mb-6 border-b border-[#e2e8e5] pb-1">
+          <button onClick={() => router.push('/admin')} className="text-sm font-medium pb-3 border-b-2 border-transparent text-gray-500 hover:text-gray-800 transition-all">
+            👥 Quản lý tài khoản
+          </button>
+          <button onClick={() => router.push('/admin/knowledge')} className="text-sm font-medium pb-3 border-b-2 border-transparent text-gray-500 hover:text-gray-800 transition-all">
+            📚 Kho kiến thức AI
+          </button>
+          <button onClick={() => router.push('/admin/faq')} className="text-sm font-bold pb-3 border-b-2 transition-all" style={{ color: G_DARK, borderColor: G_DARK }}>
+            💬 Câu hỏi Q&A (FAQ)
+          </button>
+        </div>
+
         {/* Filters */}
         <div className="flex gap-3 mb-5">
           <div className="relative flex-1">

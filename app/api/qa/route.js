@@ -1,30 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { readFileSync } from 'fs';
-import { join } from 'path';
 import { streamLLM } from '@/lib/llm';
-
-function loadFaq() {
-  try { return JSON.parse(readFileSync(join(process.cwd(), 'faq.json'), 'utf-8')); } catch { return []; }
-}
-
-function buildFaqContext(items) {
-  if (!items.length) return 'Chưa có dữ liệu FAQ.';
-  const byCategory = {};
-  for (const item of items) {
-    if (!byCategory[item.category]) byCategory[item.category] = [];
-    byCategory[item.category].push(item);
-  }
-  const lines = [];
-  for (const [cat, catItems] of Object.entries(byCategory)) {
-    lines.push(`\n## ${cat}`);
-    for (const item of catItems) {
-      lines.push(`\nCâu hỏi: ${item.question}`);
-      lines.push(`Trả lời: ${item.answer}`);
-    }
-  }
-  return lines.join('\n');
-}
 
 export async function POST(request) {
   const session = await getSession();
@@ -33,12 +9,51 @@ export async function POST(request) {
   const { question } = await request.json();
   if (!question?.trim()) return NextResponse.json({ error: 'Câu hỏi không được để trống' }, { status: 400 });
 
-  const faqItems = loadFaq();
-  const faqContext = buildFaqContext(faqItems);
+  const { query: dbQuery } = require('@/lib/db');
+
+  // 1. Search matching FAQs
+  const faqLike = `%${question.substring(0, 50)}%`;
+  const faqRes = await dbQuery(
+    `SELECT question, answer FROM faqs 
+     WHERE is_active = true 
+       AND (question ILIKE $1 OR answer ILIKE $1)
+     LIMIT 5`,
+    [faqLike]
+  );
+
+  // 2. Search matching general knowledge documents
+  const knowledgeRes = await dbQuery(
+    `SELECT title, content FROM knowledge_documents 
+     WHERE is_active = true 
+       AND (title ILIKE $1 OR content ILIKE $1)
+     LIMIT 3`,
+    [faqLike]
+  );
+
+  // 3. Build context
+  const lines = [];
+  
+  if (faqRes.rows.length > 0) {
+    lines.push('CÂU HỎI THƯỜNG GẶP (FAQ) LIÊN QUAN:');
+    for (const item of faqRes.rows) {
+      lines.push(`Hỏi: ${item.question}`);
+      lines.push(`Đáp: ${item.answer}\n`);
+    }
+  }
+
+  if (knowledgeRes.rows.length > 0) {
+    lines.push('TÀI LIỆU KIẾN THỨC NỘI BỘ LIÊN QUAN:');
+    for (const item of knowledgeRes.rows) {
+      lines.push(`--- ${item.title} ---`);
+      lines.push(`${item.content}\n`);
+    }
+  }
+
+  const combinedContext = lines.join('\n') || 'Chưa có dữ liệu FAQ hay tài liệu nội bộ nào liên quan trực tiếp.';
 
   const systemPrompt = `Bạn là trợ lý hỗ trợ nhân sự kinh doanh của Công ty TNHH Trà Dược Việt Nam.
 
-NHIỆM VỤ: Trả lời câu hỏi dựa trên DỮ LIỆU NỘI BỘ bên dưới. Nếu câu hỏi không có trong dữ liệu, hãy nói rõ "Thông tin này chưa có trong cơ sở dữ liệu nội bộ" và gợi ý liên hệ bộ phận liên quan.
+NHIỆM VỤ: Trả lời câu hỏi dựa trên DỮ LIỆU NỘI BỘ bên dưới. Nếu câu hỏi không thể trả lời dựa trên dữ liệu này, hãy nói rõ "Thông tin này chưa có trong cơ sở dữ liệu nội bộ" và gợi ý liên hệ bộ phận liên quan.
 
 QUY TẮC:
 - Trả lời ngắn gọn, rõ ràng, dễ hiểu
@@ -48,7 +63,7 @@ QUY TẮC:
 - Có thể gợi ý câu trả lời sẵn sàng để nhân sự dùng trả lời khách hàng (nếu phù hợp)
 
 DỮ LIỆU NỘI BỘ:
-${faqContext}`;
+${combinedContext}`;
 
   const encoder = new TextEncoder();
   const stream = new ReadableStream({

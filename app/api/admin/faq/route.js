@@ -1,53 +1,47 @@
 import { NextResponse } from 'next/server';
 import { getSession } from '@/lib/auth';
-import { readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
-
-const FAQ_FILE = join(process.cwd(), 'faq.json');
-
-function loadFaq() {
-  try { return JSON.parse(readFileSync(FAQ_FILE, 'utf-8')); } catch { return []; }
-}
-function saveFaq(data) {
-  writeFileSync(FAQ_FILE, JSON.stringify(data, null, 2));
-}
+import { query } from '@/lib/db';
 
 export async function GET() {
   const session = await getSession();
   if (!session || session.role !== 'admin') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  return NextResponse.json({ items: loadFaq() });
+  
+  const result = await query('SELECT * FROM faqs ORDER BY created_at DESC');
+  return NextResponse.json({ items: result.rows });
 }
 
 export async function POST(request) {
   const session = await getSession();
   if (!session || session.role !== 'admin') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-  const body = await request.json();
-  const { category, question, answer, tags = [] } = body;
+  
+  const { category, question, answer, tags = [] } = await request.json();
   if (!category || !question || !answer) return NextResponse.json({ error: 'Thiếu thông tin' }, { status: 400 });
-  const items = loadFaq();
-  const id = `faq_${Date.now()}`;
-  items.push({ id, category, question, answer, tags });
-  saveFaq(items);
-  return NextResponse.json({ item: { id, category, question, answer, tags } });
+  
+  const result = await query(
+    'INSERT INTO faqs (category, question, answer, tags) VALUES ($1, $2, $3, $4) RETURNING *',
+    [category, question, answer, tags]
+  );
+  return NextResponse.json({ item: result.rows[0] });
 }
 
 export async function PUT(request) {
   const session = await getSession();
   if (!session || session.role !== 'admin') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  
   const body = await request.json();
-  const items = loadFaq();
-  const idx = items.findIndex(i => i.id === body.id);
-  if (idx === -1) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  items[idx] = { ...items[idx], ...body };
-  saveFaq(items);
-  return NextResponse.json({ item: items[idx] });
+  const result = await query(
+    'UPDATE faqs SET category = COALESCE($2, category), question = COALESCE($3, question), answer = COALESCE($4, answer), tags = COALESCE($5, tags) WHERE id = $1 RETURNING *',
+    [body.id, body.category, body.question, body.answer, body.tags]
+  );
+  if (result.rows.length === 0) return NextResponse.json({ error: 'Not found' }, { status: 404 });
+  return NextResponse.json({ item: result.rows[0] });
 }
 
 export async function DELETE(request) {
   const session = await getSession();
   if (!session || session.role !== 'admin') return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  
   const { id } = await request.json();
-  const items = loadFaq().filter(i => i.id !== id);
-  saveFaq(items);
+  await query('DELETE FROM faqs WHERE id = $1', [id]);
   return NextResponse.json({ ok: true });
 }
