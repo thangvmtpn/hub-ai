@@ -827,11 +827,16 @@ function QAPanel({ agent, dept, onClose }) {
     try {
       const res = await fetch('/api/qa', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ question: q }) });
       const reader = res.body.getReader(); const decoder = new TextDecoder();
+      let buffer = '';
       while (true) {
         const { done, value } = await reader.read(); if (done) break;
-        for (const line of decoder.decode(value).split('\n')) {
-          if (!line.startsWith('data: ')) continue;
-          const d = line.slice(6); if (d === '[DONE]') continue;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          const cleanLine = line.trim();
+          if (!cleanLine.startsWith('data: ')) continue;
+          const d = cleanLine.slice(6); if (d === '[DONE]') continue;
           try { const p = JSON.parse(d); if (p.text) { answer += p.text; setMessages(m => [...m.slice(0, -1), { role: 'assistant', text: answer }]); } } catch {}
         }
       }
@@ -973,12 +978,17 @@ function ContentCreatorPanel({ agent, dept, user, onClose }) {
       const reader = res.body.getReader();
       const decoder = new TextDecoder();
       let full = '';
+      let buffer = '';
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
-        for (const line of decoder.decode(value).split('\n')) {
-          if (!line.startsWith('data: ')) continue;
-          const d = line.slice(6);
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop();
+        for (const line of lines) {
+          const cleanLine = line.trim();
+          if (!cleanLine.startsWith('data: ')) continue;
+          const d = cleanLine.slice(6);
           if (d === '[DONE]') continue;
           try {
             const p = JSON.parse(d);
@@ -1000,7 +1010,9 @@ function ContentCreatorPanel({ agent, dept, user, onClose }) {
               setHistory(h => [{ text: full, image: null, time: new Date().toLocaleTimeString('vi-VN') }, ...h].slice(0, 10));
             }
             if (p.error) setResult(`Lỗi: ${p.error}`);
-          } catch {}
+          } catch (e) {
+            console.error('Failed to parse line:', cleanLine, e);
+          }
         }
       }
     } catch { setResult('Lỗi kết nối. Vui lòng thử lại.'); }
@@ -1315,11 +1327,16 @@ function AgentPanel({ agent, dept, user, onClose }) {
         const res = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ agentId: agent.id, formData }) });
         if (!res.ok) { const e = await res.json(); setResult(`Lỗi: ${e.error}`); setLoading(false); return; }
         const reader = res.body.getReader(); const decoder = new TextDecoder(); let full = '';
+        let buffer = '';
         while (true) {
           const { done, value } = await reader.read(); if (done) break;
-          for (const line of decoder.decode(value).split('\n')) {
-            if (!line.startsWith('data: ')) continue;
-            const d = line.slice(6); if (d === '[DONE]') continue;
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split('\n');
+          buffer = lines.pop();
+          for (const line of lines) {
+            const cleanLine = line.trim();
+            if (!cleanLine.startsWith('data: ')) continue;
+            const d = cleanLine.slice(6); if (d === '[DONE]') continue;
             try { const p = JSON.parse(d); if (p.text) { full += p.text; setResult(full); } if (p.error) setResult(`Lỗi: ${p.error}`); } catch {}
           }
         }
