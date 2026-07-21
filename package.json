@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start -p 3900",
-    "seed": "node lib/seed-users.mjs"
+    "seed": "node lib/seed-users.mjs",
+    "seed:pg": "node lib/seed-users-pg.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -16,6 +17,7 @@
     "jose": "^5.9.0",
     "jspdf": "^4.2.1",
     "next": "^14.2.0",
+    "pg": "^8.11.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0"
   },

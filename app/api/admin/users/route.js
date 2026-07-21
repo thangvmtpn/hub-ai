@@ -1,14 +1,6 @@
 import { NextResponse } from 'next/server';
-import { getSession, getUsers } from '@/lib/auth';
-import { readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { getSession, getUsers, getUserByUsername, createUser, updateUser, deleteUser } from '@/lib/auth';
 import bcrypt from 'bcryptjs';
-
-const USERS_FILE = join(process.cwd(), 'users.json');
-
-function saveUsers(users) {
-  writeFileSync(USERS_FILE, JSON.stringify(users, null, 2));
-}
 
 // GET — list all users (admin only)
 export async function GET() {
@@ -16,7 +8,7 @@ export async function GET() {
   if (!session || session.role !== 'admin') {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
-  const users = getUsers().map(({ password, ...u }) => u); // strip password
+  const users = (await getUsers()).map(({ password, ...u }) => u); // strip password
   return NextResponse.json({ users });
 }
 
@@ -31,14 +23,13 @@ export async function POST(request) {
   if (!username || !password || !name) {
     return NextResponse.json({ error: 'Thiếu thông tin bắt buộc' }, { status: 400 });
   }
-  const users = getUsers();
-  if (users.find(u => u.username === username)) {
+  
+  const existing = await getUserByUsername(username);
+  if (existing) {
     return NextResponse.json({ error: 'Tên đăng nhập đã tồn tại' }, { status: 400 });
   }
   const hashed = await bcrypt.hash(password, 12);
-  const newUser = { username, password: hashed, name, role: 'user', department: department || 'hr', position: position || '', allowedAgents };
-  users.push(newUser);
-  saveUsers(users);
+  const newUser = await createUser({ username, password: hashed, name, role: 'user', department: department || 'hr', position: position || '', allowedAgents });
   const { password: _, ...safe } = newUser;
   return NextResponse.json({ user: safe });
 }
@@ -51,19 +42,19 @@ export async function PUT(request) {
   }
   const body = await request.json();
   const { username, name, department, position, allowedAgents, newPassword } = body;
-  const users = getUsers();
-  const idx = users.findIndex(u => u.username === username);
-  if (idx === -1) return NextResponse.json({ error: 'User not found' }, { status: 404 });
-  if (users[idx].username === 'admin' && username === 'admin') {
-    // allow updating admin but keep role
-  }
-  if (name) users[idx].name = name;
-  if (department) users[idx].department = department;
-  if (position !== undefined) users[idx].position = position;
-  if (allowedAgents !== undefined) users[idx].allowedAgents = allowedAgents;
-  if (newPassword) users[idx].password = await bcrypt.hash(newPassword, 12);
-  saveUsers(users);
-  const { password: _, ...safe } = users[idx];
+  
+  const existing = await getUserByUsername(username);
+  if (!existing) return NextResponse.json({ error: 'User not found' }, { status: 404 });
+  
+  const updateData = { username };
+  if (name) updateData.name = name;
+  if (department) updateData.department = department;
+  if (position !== undefined) updateData.position = position;
+  if (allowedAgents !== undefined) updateData.allowedAgents = allowedAgents;
+  if (newPassword) updateData.password = await bcrypt.hash(newPassword, 12);
+  
+  const updatedUser = await updateUser(updateData);
+  const { password: _, ...safe } = updatedUser;
   return NextResponse.json({ user: safe });
 }
 
@@ -75,7 +66,7 @@ export async function DELETE(request) {
   }
   const { username } = await request.json();
   if (username === 'admin') return NextResponse.json({ error: 'Không thể xóa tài khoản admin' }, { status: 400 });
-  const users = getUsers().filter(u => u.username !== username);
-  saveUsers(users);
+  
+  await deleteUser(username);
   return NextResponse.json({ ok: true });
 }
