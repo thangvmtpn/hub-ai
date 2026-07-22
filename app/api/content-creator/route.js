@@ -270,7 +270,23 @@ async function generateImage(prompt, style, productKey) {
     }
   }
 
-  // ─── Strategy 3: Unsplash fallback ────────────────────────────────────────
+  // ─── Strategy 3: Pollinations FLUX AI Engine (Free high-speed FLUX AI model) ──
+  try {
+    console.log('[IMAGE] Trying Pollinations FLUX AI Engine...');
+    const seed = Math.floor(Math.random() * 1000000);
+    const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPrompt)}?width=1024&height=1024&seed=${seed}&nologo=true&model=flux`;
+    
+    console.log('[IMAGE] ✅ Success with Pollinations FLUX AI');
+    return {
+      url: pollinationsUrl,
+      revised_prompt: finalPrompt,
+      isFallback: false
+    };
+  } catch (e) {
+    console.warn('[IMAGE] ❌ Pollinations FLUX failed:', e.message);
+  }
+
+  // ─── Strategy 4: Unsplash fallback ────────────────────────────────────────
   console.warn('[IMAGE] ⚠️ All AI image providers failed. Using Unsplash fallback.');
   return {
     url: getUnsplashFallback(),
