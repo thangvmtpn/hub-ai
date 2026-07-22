@@ -430,7 +430,8 @@ export async function POST(request) {
                 prompt: aiImagePrompt || 'Auto-generated',
                 revised_prompt: imageResult.revised_prompt,
                 style: styleKey,
-                masterPrompt
+                masterPrompt,
+                isFallback: imageResult.isFallback || false
               }
             })}\n\n`));
           }
