@@ -391,24 +391,14 @@ export async function POST(request) {
             }
           });
 
-          // Step 2: Extract image prompt from Claude's response or build from structured design parameters + Visual RAG
-          let aiImagePrompt = null;
+          // Step 2: ALWAYS use the Master English Prompt (structured 9-parameter engine) for image generation.
+          // This ensures the displayed "Master English Prompt" and the actual DALL-E/FLUX prompt are IDENTICAL.
           const visualAssets = await getMatchingVisualAssets(productKey);
           const structuredBanner = buildBannerPrompt(formData, visualAssets);
           const masterPrompt = structuredBanner.masterPrompt;
           
-          if (formData.headline || formData.visual_elements) {
-            aiImagePrompt = masterPrompt;
-          } else {
-            // Lấy nội dung nằm trong [IMAGE_PROMPT]...[/IMAGE_PROMPT] hoặc ---IMAGE_PROMPT---
-            const imgMatch = fullText.match(/\[IMAGE_PROMPT\]([\s\S]*?)\[\/IMAGE_PROMPT\]/i) || 
-                             fullText.match(/---IMAGE_PROMPT---([\s\S]*?)---END_IMAGE_PROMPT---/i) ||
-                             fullText.match(/IMAGE_PROMPT:([\s\S]*)$/i);
-                             
-            if (imgMatch && imgMatch[1]) {
-              aiImagePrompt = imgMatch[1].trim();
-            }
-          }
+          // Master Prompt is ALWAYS the image generation prompt — no more mismatch
+          let aiImagePrompt = masterPrompt;
 
           // Send the clean text (without image prompt markers)
           let cleanText = fullText
