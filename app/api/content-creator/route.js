@@ -10,6 +10,7 @@ import {
 import { streamLLM } from '@/lib/llm';
 import { query } from '@/lib/db';
 import { buildBannerPrompt } from '@/lib/banner-prompt-builder';
+import { getMatchingVisualAssets } from '@/lib/visual-retrieval';
 
 // ─── Map user selections → internal keys ─────────────────────────────────────
 const GROUP_MAP = {
@@ -383,9 +384,10 @@ export async function POST(request) {
             }
           });
 
-          // Step 2: Extract image prompt from Claude's response or build from structured design parameters
+          // Step 2: Extract image prompt from Claude's response or build from structured design parameters + Visual RAG
           let aiImagePrompt = null;
-          const structuredBanner = buildBannerPrompt(formData);
+          const visualAssets = await getMatchingVisualAssets(productKey);
+          const structuredBanner = buildBannerPrompt(formData, visualAssets);
           const masterPrompt = structuredBanner.masterPrompt;
           
           if (formData.headline || formData.visual_elements) {

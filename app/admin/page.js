@@ -86,6 +86,9 @@ export default function AdminPage() {
           <button onClick={() => router.push('/admin/faq')} className="text-sm font-medium pb-3 border-b-2 border-transparent text-gray-500 hover:text-gray-800 transition-all">
             💬 Câu hỏi Q&A (FAQ)
           </button>
+          <button onClick={() => router.push('/admin/visual-library')} className="text-sm font-medium pb-3 border-b-2 border-transparent text-gray-500 hover:text-gray-800 transition-all">
+            🖼 Kho ảnh mẫu (Visual Library)
+          </button>
         </div>
 
         {/* Stats */}
