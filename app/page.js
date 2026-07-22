@@ -965,8 +965,36 @@ function ContentCreatorPanel({ agent, dept, user, onClose }) {
   const [copied, setCopied] = useState(false);
   const [imgFullscreen, setImgFullscreen] = useState(false);
   const [history, setHistory] = useState([]);
+  const [uploadingField, setUploadingField] = useState('');
   const resultRef = useRef(null);
-  const isFormValid = agent.fields.filter(f => f.required).every(f => formData[f.key]?.trim());
+
+  const handleFileUpload = async (file, key) => {
+    if (!file) return;
+    setUploadingField(key);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.url) {
+        setFormData(p => ({ ...p, [key]: data.url }));
+      } else {
+        alert(data.error || 'Lỗi tải ảnh');
+      }
+    } catch (e) {
+      alert('Lỗi kết nối khi tải ảnh');
+    }
+    setUploadingField('');
+  };
+
+  const isFormValid = agent.fields
+    .filter(f => {
+      if (!f.required) return false;
+      if (!f.showIf) return true;
+      const currentObj = formData.prompt_objective || '';
+      return f.showIf.split(',').some(cond => currentObj.includes(cond));
+    })
+    .every(f => formData[f.key]?.trim());
 
   const handleSubmit = async () => {
     if (loading) return;
@@ -1107,38 +1135,65 @@ function ContentCreatorPanel({ agent, dept, user, onClose }) {
           <div className="flex flex-col overflow-y-auto px-6 py-5 flex-shrink-0"
             style={{ width: 350, borderRight: '1.5px solid #e8f5e9', background: '#FAFFF7' }}>
             <div className="space-y-3.5 mb-5">
-              {agent.fields.map(field => (
-                <div key={field.key}>
-                  <label className="block text-[11px] font-bold mb-1.5 tracking-wide" style={{ color: '#2E7D32' }}>
-                    {field.label.toUpperCase()}{field.required && <span className="ml-1 text-red-500">*</span>}
-                  </label>
-                  {field.type === 'select' ? (
-                    <select value={formData[field.key] || ''}
-                      onChange={e => setFormData(p => ({ ...p, [field.key]: e.target.value }))}
-                      className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none transition cursor-pointer"
-                      style={{ background: '#fff', border: '1.5px solid #C8E6C9', color: '#1B4332' }}
-                      onFocus={e => e.target.style.borderColor = '#2E7D32'}
-                      onBlur={e => e.target.style.borderColor = '#C8E6C9'}>
-                      <option value="">— Chọn —</option>
-                      {field.options.map(opt => <option key={opt}>{opt}</option>)}
-                    </select>
-                  ) : field.type === 'textarea' ? (
-                    <textarea value={formData[field.key] || ''} onChange={e => setFormData(p => ({ ...p, [field.key]: e.target.value }))}
-                      placeholder={field.placeholder} rows={2}
-                      className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none transition resize-y"
-                      style={{ background: '#fff', border: '1.5px solid #C8E6C9', color: '#1B4332', lineHeight: 1.5 }}
-                      onFocus={e => e.target.style.borderColor = '#2E7D32'}
-                      onBlur={e => e.target.style.borderColor = '#C8E6C9'} />
-                  ) : (
-                    <input type="text" value={formData[field.key] || ''} onChange={e => setFormData(p => ({ ...p, [field.key]: e.target.value }))}
-                      placeholder={field.placeholder}
-                      className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none transition"
-                      style={{ background: '#fff', border: '1.5px solid #C8E6C9', color: '#1B4332' }}
-                      onFocus={e => e.target.style.borderColor = '#2E7D32'}
-                      onBlur={e => e.target.style.borderColor = '#C8E6C9'} />
-                  )}
-                </div>
-              ))}
+              {agent.fields
+                .filter(field => {
+                  if (!field.showIf) return true;
+                  const currentObj = formData.prompt_objective || '';
+                  const requiredConditions = field.showIf.split(',');
+                  return requiredConditions.some(cond => currentObj.includes(cond));
+                })
+                .map(field => (
+                  <div key={field.key} className="fade-up">
+                    <label className="block text-[11px] font-bold mb-1.5 tracking-wide" style={{ color: '#2E7D32' }}>
+                      {field.label.toUpperCase()}{field.required && <span className="ml-1 text-red-500">*</span>}
+                    </label>
+                    {field.type === 'select' ? (
+                      <select value={formData[field.key] || ''}
+                        onChange={e => setFormData(p => ({ ...p, [field.key]: e.target.value }))}
+                        className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none transition cursor-pointer"
+                        style={{ background: '#fff', border: '1.5px solid #C8E6C9', color: '#1B4332' }}
+                        onFocus={e => e.target.style.borderColor = '#2E7D32'}
+                        onBlur={e => e.target.style.borderColor = '#C8E6C9'}>
+                        <option value="">— Chọn —</option>
+                        {field.options.map(opt => <option key={opt}>{opt}</option>)}
+                      </select>
+                    ) : field.type === 'textarea' ? (
+                      <textarea value={formData[field.key] || ''} onChange={e => setFormData(p => ({ ...p, [field.key]: e.target.value }))}
+                        placeholder={field.placeholder} rows={2}
+                        className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none transition resize-y"
+                        style={{ background: '#fff', border: '1.5px solid #C8E6C9', color: '#1B4332', lineHeight: 1.5 }}
+                        onFocus={e => e.target.style.borderColor = '#2E7D32'}
+                        onBlur={e => e.target.style.borderColor = '#C8E6C9'} />
+                    ) : field.type === 'image_upload' ? (
+                      <div className="space-y-2">
+                        <label className="cursor-pointer px-3 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 border border-dashed transition"
+                          style={{ background: '#E8F5E9', borderColor: '#2E7D32', color: '#1B4332' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                          {uploadingField === field.key ? 'Đang tải ảnh lên...' : '📁 Tải ảnh từ máy tính'}
+                          <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleFileUpload(e.target.files[0], field.key)} />
+                        </label>
+                        <input type="text" value={formData[field.key] || ''} onChange={e => setFormData(p => ({ ...p, [field.key]: e.target.value }))}
+                          placeholder={field.placeholder || "Hoặc dán URL ảnh tại đây..."}
+                          className="w-full px-3 py-2 rounded-xl text-xs focus:outline-none transition font-mono border"
+                          style={{ background: '#fff', borderColor: '#C8E6C9', color: '#1B4332' }} />
+                        {formData[field.key] && (
+                          <div className="relative rounded-xl overflow-hidden border border-[#A5D6A7] p-1 bg-white shadow-sm">
+                            <img src={formData[field.key]} alt="Preview" className="w-full h-24 object-cover rounded-lg" />
+                            <button type="button" onClick={() => setFormData(p => ({ ...p, [field.key]: '' }))}
+                              className="absolute top-2 right-2 w-6 h-6 bg-black/60 hover:bg-black text-white rounded-full text-xs font-bold flex items-center justify-center">✕</button>
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      <input type="text" value={formData[field.key] || ''} onChange={e => setFormData(p => ({ ...p, [field.key]: e.target.value }))}
+                        placeholder={field.placeholder}
+                        className="w-full px-3 py-2.5 rounded-xl text-sm focus:outline-none transition"
+                        style={{ background: '#fff', border: '1.5px solid #C8E6C9', color: '#1B4332' }}
+                        onFocus={e => e.target.style.borderColor = '#2E7D32'}
+                        onBlur={e => e.target.style.borderColor = '#C8E6C9'} />
+                    )}
+                  </div>
+                ))}
             </div>
 
             <button onClick={handleSubmit} disabled={loading || !isFormValid}

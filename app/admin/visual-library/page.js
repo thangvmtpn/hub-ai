@@ -28,6 +28,26 @@ export default function VisualLibraryAdminPage() {
   const [search, setSearch] = useState('');
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [editAsset, setEditAsset] = useState(null);
+  const [uploading, setUploading] = useState(false);
+
+  const handleUploadFile = async (file) => {
+    if (!file) return;
+    setUploading(true);
+    try {
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: fd });
+      const data = await res.json();
+      if (data.url) {
+        setFormData(p => ({ ...p, image_url: data.url }));
+      } else {
+        alert(data.error || 'Lỗi tải ảnh');
+      }
+    } catch (e) {
+      alert('Lỗi kết nối khi tải ảnh');
+    }
+    setUploading(false);
+  };
 
   // Form state
   const [formData, setFormData] = useState({
@@ -272,9 +292,24 @@ export default function VisualLibraryAdminPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1">URL Hình ảnh (Link Unsplash / CDN)</label>
-                <input type="text" required value={formData.image_url} onChange={e => setFormData({ ...formData, image_url: e.target.value })}
-                  className="w-full px-3 py-2 text-xs border rounded-xl focus:outline-none font-mono" placeholder="https://images.unsplash.com/..." />
+                <label className="block text-xs font-bold text-gray-700 mb-1">Hình ảnh Visual Mẫu (Upload file hoặc dán URL)</label>
+                <div className="space-y-2">
+                  <div className="flex gap-2">
+                    <label className="cursor-pointer px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-dashed transition"
+                      style={{ background: '#E8F5E9', borderColor: G_DARK, color: G_DARK }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                      {uploading ? 'Đang tải ảnh lên...' : '📁 Tải ảnh từ máy tính'}
+                      <input type="file" accept="image/*" className="hidden" onChange={e => e.target.files?.[0] && handleUploadFile(e.target.files[0])} />
+                    </label>
+                  </div>
+                  <input type="text" required value={formData.image_url} onChange={e => setFormData({ ...formData, image_url: e.target.value })}
+                    className="w-full px-3 py-2 text-xs border rounded-xl focus:outline-none font-mono" placeholder="https://... hoặc /uploads/..." />
+                  {formData.image_url && (
+                    <div className="relative rounded-xl overflow-hidden border border-gray-200 p-1 bg-gray-50 flex items-center justify-center">
+                      <img src={formData.image_url} alt="Visual Preview" className="h-32 object-contain rounded-lg" onError={e => e.target.style.display = 'none'} />
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
