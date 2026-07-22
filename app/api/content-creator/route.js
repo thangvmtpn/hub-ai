@@ -181,11 +181,12 @@ async function generateImage(prompt, style, productKey) {
   const variant = selectImageVariant(productKey);
   const fallbackPrompt = `${styleObj.variants[variant] || styleObj.variants.teapot}. ${styleObj.basePrompt}`;
 
-  // Use the AI-generated prompt if available, otherwise fallback
-  const negativePrompt = "No text, no words, no letters, no typography, no watermarks, clean focus.";
-  const finalPrompt = prompt
-    ? `${prompt}. Style: ${styleObj.basePrompt}. ${negativePrompt}`
-    : `${fallbackPrompt}. ${negativePrompt}`;
+  const negativePrompt = "No unwanted text clutter, no low resolution, no blurry details, no distorted elements.";
+  const isMasterPrompt = prompt && (prompt.includes('banner design') || prompt.includes('commercial'));
+
+  const finalPrompt = isMasterPrompt
+    ? prompt
+    : (prompt ? `${prompt}. Style: ${styleObj.basePrompt}. ${negativePrompt}` : `${fallbackPrompt}. ${negativePrompt}`);
 
   console.log('[IMAGE] Final prompt:', finalPrompt.substring(0, 200) + '...');
 
@@ -194,9 +195,9 @@ async function generateImage(prompt, style, productKey) {
     return list[Math.floor(Math.random() * list.length)];
   };
 
-  // ─── Strategy 1: OpenAI gpt-image-1 (primary — works on all paid accounts) ──
+  // ─── Strategy 1: OpenAI DALL-E 3 ──────────────────────────────────────────
   if (process.env.OPENAI_API_KEY) {
-    const models = ['gpt-image-1', 'dall-e-3', 'dall-e-2'];
+    const models = ['dall-e-3', 'dall-e-2'];
     for (const model of models) {
       try {
         console.log(`[IMAGE] Trying OpenAI ${model}...`);
@@ -211,14 +212,13 @@ async function generateImage(prompt, style, productKey) {
             prompt: finalPrompt,
             n: 1,
             size: '1024x1024',
-            ...(model === 'gpt-image-1' ? { quality: 'medium' } : {})
+            ...(model === 'dall-e-3' ? { quality: 'standard', style: 'vivid' } : {})
           }),
         });
 
         if (response.ok) {
           const data = await response.json();
           const imageData = data.data?.[0];
-          // gpt-image-1 returns b64_json by default, dall-e returns url
           const url = imageData?.url || (imageData?.b64_json ? `data:image/png;base64,${imageData.b64_json}` : null);
           if (url) {
             console.log(`[IMAGE] ✅ Success with OpenAI ${model}`);
