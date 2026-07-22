@@ -957,6 +957,8 @@ function ContentCreatorPanel({ agent, dept, user, onClose }) {
   const [imageData, setImageData] = useState(null);
   const [imageLoading, setImageLoading] = useState(false);
   const [imageError, setImageError] = useState('');
+  const [masterPrompt, setMasterPrompt] = useState('');
+  const [promptCopied, setPromptCopied] = useState(false);
   const [loading, setLoading] = useState(false);
   const [trainingOpen, setTrainingOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -967,7 +969,7 @@ function ContentCreatorPanel({ agent, dept, user, onClose }) {
 
   const handleSubmit = async () => {
     if (loading) return;
-    setLoading(true); setResult(''); setImageData(null); setImageError(''); setImageLoading(false);
+    setLoading(true); setResult(''); setImageData(null); setImageError(''); setImageLoading(false); setMasterPrompt('');
     try {
       const res = await fetch('/api/content-creator', {
         method: 'POST',
@@ -993,6 +995,7 @@ function ContentCreatorPanel({ agent, dept, user, onClose }) {
           try {
             const p = JSON.parse(d);
             if (p.text) { full += p.text; setResult(full); }
+            if (p.masterPrompt) setMasterPrompt(p.masterPrompt);
             if (p.textComplete && p.cleanText) {
               full = p.cleanText;
               setResult(p.cleanText);
@@ -1000,12 +1003,14 @@ function ContentCreatorPanel({ agent, dept, user, onClose }) {
             if (p.imageLoading) setImageLoading(true);
             if (p.image) {
               setImageData(p.image);
+              if (p.image.masterPrompt) setMasterPrompt(p.image.masterPrompt);
               setImageLoading(false);
               // Save to history
               setHistory(h => [{ text: full, image: p.image, time: new Date().toLocaleTimeString('vi-VN') }, ...h].slice(0, 10));
             }
             if (p.imageError) {
               setImageError(p.imageError);
+              if (p.masterPrompt) setMasterPrompt(p.masterPrompt);
               setImageLoading(false);
               setHistory(h => [{ text: full, image: null, time: new Date().toLocaleTimeString('vi-VN') }, ...h].slice(0, 10));
             }
@@ -1289,6 +1294,31 @@ function ContentCreatorPanel({ agent, dept, user, onClose }) {
                         </div>
                       )}
                     </div>
+                  </div>
+                )}
+
+                {/* Master Prompt Card for Midjourney / DALL-E / ChatGPT */}
+                {(masterPrompt || imageData?.masterPrompt) && (
+                  <div className="mt-4 p-4 rounded-2xl border fade-up" style={{ background: '#F8F7FF', borderColor: '#E0D9FF' }}>
+                    <div className="flex items-center justify-between mb-2.5">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold" style={{ color: '#4B38B3' }}>✨ Master English Prompt (DALL-E 3 / Midjourney / ChatGPT):</span>
+                      </div>
+                      <button onClick={() => {
+                        const pText = masterPrompt || imageData?.masterPrompt;
+                        navigator.clipboard.writeText(pText);
+                        setPromptCopied(true);
+                        setTimeout(() => setPromptCopied(false), 2000);
+                      }}
+                      className="px-3 py-1.5 rounded-xl text-xs font-bold text-white transition flex items-center gap-1.5 shadow-sm"
+                      style={{ background: promptCopied ? '#2E7D32' : 'linear-gradient(135deg, #6941F6, #4f2fe0)' }}>
+                        {promptCopied ? '✓ Đã sao chép Prompt!' : '📋 Sao chép Prompt 1-Click'}
+                      </button>
+                    </div>
+                    <p className="text-xs font-mono p-3 rounded-xl border leading-relaxed select-all"
+                      style={{ background: '#fff', borderColor: '#E8E3FF', color: '#33296B' }}>
+                      {masterPrompt || imageData?.masterPrompt}
+                    </p>
                   </div>
                 )}
               </div>

@@ -9,6 +9,7 @@ import {
 } from '@/lib/tea-knowledge';
 import { streamLLM } from '@/lib/llm';
 import { query } from '@/lib/db';
+import { buildBannerPrompt } from '@/lib/banner-prompt-builder';
 
 // ─── Map user selections → internal keys ─────────────────────────────────────
 const GROUP_MAP = {
@@ -382,16 +383,22 @@ export async function POST(request) {
             }
           });
 
-          // Step 2: Extract image prompt from Claude's response
+          // Step 2: Extract image prompt from Claude's response or build from structured design parameters
           let aiImagePrompt = null;
+          const structuredBanner = buildBannerPrompt(formData);
+          const masterPrompt = structuredBanner.masterPrompt;
           
-          // Lấy nội dung nằm trong [IMAGE_PROMPT]...[/IMAGE_PROMPT] hoặc ---IMAGE_PROMPT---
-          const imgMatch = fullText.match(/\[IMAGE_PROMPT\]([\s\S]*?)\[\/IMAGE_PROMPT\]/i) || 
-                           fullText.match(/---IMAGE_PROMPT---([\s\S]*?)---END_IMAGE_PROMPT---/i) ||
-                           fullText.match(/IMAGE_PROMPT:([\s\S]*)$/i);
-                           
-          if (imgMatch && imgMatch[1]) {
-            aiImagePrompt = imgMatch[1].trim();
+          if (formData.headline || formData.visual_elements) {
+            aiImagePrompt = masterPrompt;
+          } else {
+            // Lấy nội dung nằm trong [IMAGE_PROMPT]...[/IMAGE_PROMPT] hoặc ---IMAGE_PROMPT---
+            const imgMatch = fullText.match(/\[IMAGE_PROMPT\]([\s\S]*?)\[\/IMAGE_PROMPT\]/i) || 
+                             fullText.match(/---IMAGE_PROMPT---([\s\S]*?)---END_IMAGE_PROMPT---/i) ||
+                             fullText.match(/IMAGE_PROMPT:([\s\S]*)$/i);
+                             
+            if (imgMatch && imgMatch[1]) {
+              aiImagePrompt = imgMatch[1].trim();
+            }
           }
 
           // Send the clean text (without image prompt markers)
@@ -401,9 +408,9 @@ export async function POST(request) {
             .trim();
 
           // Notify client that text is complete
-          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ textComplete: true, cleanText })}\n\n`));
+          controller.enqueue(encoder.encode(`data: ${JSON.stringify({ textComplete: true, cleanText, masterPrompt })}\n\n`));
 
-          // Step 3: Generate image with DALL-E 3
+          // Step 3: Generate image with DALL-E 3 / OpenAI / Gemini
           controller.enqueue(encoder.encode(`data: ${JSON.stringify({ imageLoading: true })}\n\n`));
 
           const imageResult = await generateImage(aiImagePrompt, styleKey, productKey);
@@ -411,7 +418,8 @@ export async function POST(request) {
           if (imageResult.error) {
             controller.enqueue(encoder.encode(`data: ${JSON.stringify({
               imageError: imageResult.error,
-              imageFallback: true
+              imageFallback: true,
+              masterPrompt
             })}\n\n`));
           } else {
             controller.enqueue(encoder.encode(`data: ${JSON.stringify({
@@ -419,7 +427,8 @@ export async function POST(request) {
                 url: imageResult.url,
                 prompt: aiImagePrompt || 'Auto-generated',
                 revised_prompt: imageResult.revised_prompt,
-                style: styleKey
+                style: styleKey,
+                masterPrompt
               }
             })}\n\n`));
           }
