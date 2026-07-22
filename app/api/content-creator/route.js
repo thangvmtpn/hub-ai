@@ -149,6 +149,7 @@ function selectImageVariant(productKey) {
 }
 
 // ─── Generate image with DALL-E 3 ────────────────────────────────────────────
+// ─── Generate image with DALL-E 3 ────────────────────────────────────────────
 const FALLBACK_IMAGES = {
   van_loc_tra: [
     'https://images.unsplash.com/photo-1563245372-f21724e3856d?q=80&w=1024&auto=format&fit=crop',
@@ -163,8 +164,8 @@ const FALLBACK_IMAGES = {
     'https://images.unsplash.com/photo-1563822249548-9a72b6353cd1?q=80&w=1024&auto=format&fit=crop'
   ],
   traba: [
-    'https://images.unsplash.com/photo-1509440159596-0249088772ff?q=80&w=1024&auto=format&fit=crop',
-    'https://images.unsplash.com/photo-1495147466023-ac5c588e2e94?q=80&w=1024&auto=format&fit=crop'
+    'https://images.unsplash.com/photo-1544787219-7f47ccb76574?q=80&w=1024&auto=format&fit=crop',
+    'https://images.unsplash.com/photo-1563822249548-9a72b6353cd1?q=80&w=1024&auto=format&fit=crop'
   ],
   van_thinh_tra: [
     'https://images.unsplash.com/photo-1549465220-1a8b9238cd48?q=80&w=1024&auto=format&fit=crop',
@@ -197,75 +198,65 @@ async function generateImage(prompt, style, productKey) {
 
   // ─── Strategy 1: OpenAI DALL-E 3 ──────────────────────────────────────────
   if (process.env.OPENAI_API_KEY) {
-    const models = ['dall-e-3', 'dall-e-2'];
-    for (const model of models) {
-      try {
-        console.log(`[IMAGE] Trying OpenAI ${model}...`);
-        const response = await fetch('https://api.openai.com/v1/images/generations', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model,
-            prompt: finalPrompt,
-            n: 1,
-            size: '1024x1024',
-            ...(model === 'dall-e-3' ? { quality: 'standard', style: 'vivid' } : {})
-          }),
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          const imageData = data.data?.[0];
-          const url = imageData?.url || (imageData?.b64_json ? `data:image/png;base64,${imageData.b64_json}` : null);
-          if (url) {
-            console.log(`[IMAGE] ✅ Success with OpenAI ${model}`);
-            return {
-              url,
-              revised_prompt: imageData?.revised_prompt || finalPrompt,
-              isFallback: false
-            };
-          }
-        }
-        
-        const err = await response.json().catch(() => ({}));
-        const errMsg = err.error?.message || JSON.stringify(err);
-        console.warn(`[IMAGE] ❌ OpenAI ${model} failed:`, errMsg);
-        
-        // If billing/auth error, no point trying other OpenAI models
-        if (errMsg.includes('billing') || errMsg.includes('insufficient_quota') || errMsg.includes('authentication')) {
-          console.warn('[IMAGE] OpenAI auth/billing issue, skipping remaining models');
-          break;
-        }
-      } catch (e) {
-        console.warn(`[IMAGE] ❌ OpenAI ${model} exception:`, e.message);
-      }
-    }
-  }
-
-  // ─── Strategy 2: Gemini Imagen ────────────────────────────────────────────
-  if (process.env.GEMINI_API_KEY) {
     try {
-      console.log('[IMAGE] Trying Gemini Imagen 3...');
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      console.log('[IMAGE] Trying OpenAI dall-e-3...');
+      const response = await fetch('https://api.openai.com/v1/images/generations', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: `Generate an image: ${finalPrompt}` }] }],
-          generationConfig: { responseModalities: ["IMAGE"] }
+          model: 'dall-e-3',
+          prompt: finalPrompt,
+          n: 1,
+          size: '1024x1024',
+          quality: 'standard'
         }),
       });
 
       if (response.ok) {
         const data = await response.json();
-        const part = data.candidates?.[0]?.content?.parts?.[0];
-        const inlineData = part?.inlineData;
-        if (inlineData && inlineData.data) {
-          console.log('[IMAGE] ✅ Success with Gemini Imagen');
+        const imageData = data.data?.[0];
+        const url = imageData?.url || (imageData?.b64_json ? `data:image/png;base64,${imageData.b64_json}` : null);
+        if (url) {
+          console.log('[IMAGE] ✅ Success with OpenAI dall-e-3');
           return {
-            url: `data:${inlineData.mimeType || 'image/png'};base64,${inlineData.data}`,
+            url,
+            revised_prompt: imageData?.revised_prompt || finalPrompt,
+            isFallback: false
+          };
+        }
+      }
+      
+      const err = await response.json().catch(() => ({}));
+      const errMsg = err.error?.message || JSON.stringify(err);
+      console.warn('[IMAGE] ❌ OpenAI dall-e-3 failed:', errMsg);
+    } catch (e) {
+      console.warn('[IMAGE] ❌ OpenAI exception:', e.message);
+    }
+  }
+
+  // ─── Strategy 2: Gemini Imagen 3 ────────────────────────────────────────────
+  if (process.env.GEMINI_API_KEY) {
+    try {
+      console.log('[IMAGE] Trying Gemini Imagen 3...');
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${process.env.GEMINI_API_KEY}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          instances: [{ prompt: finalPrompt }],
+          parameters: { sampleCount: 1, aspectRatio: "1:1" }
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const base64Data = data.predictions?.[0]?.bytesBase64Encoded;
+        if (base64Data) {
+          console.log('[IMAGE] ✅ Success with Gemini Imagen 3');
+          return {
+            url: `data:image/png;base64,${base64Data}`,
             revised_prompt: finalPrompt,
             isFallback: false
           };
@@ -273,9 +264,9 @@ async function generateImage(prompt, style, productKey) {
       }
       
       const err = await response.json().catch(() => ({}));
-      console.warn('[IMAGE] ❌ Gemini failed:', err.error?.message || JSON.stringify(err));
+      console.warn('[IMAGE] ❌ Gemini Imagen failed:', err.error?.message || JSON.stringify(err));
     } catch (e) {
-      console.warn('[IMAGE] ❌ Gemini exception:', e.message);
+      console.warn('[IMAGE] ❌ Gemini Imagen exception:', e.message);
     }
   }
 
